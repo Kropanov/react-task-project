@@ -23,16 +23,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
 
-//-----------------Personal functions--------------------
-
-
-
-
-
-
-//-------------------------------------------------------
-
-
 function createData(name, calories, fat, carbs, protein) {
     return {
         name,
@@ -134,7 +124,7 @@ function EnhancedTableHead(props) {
             <TableRow>
                 <TableCell padding="checkbox">
                     <Checkbox
-                        color="primary"
+                        color="secondary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
@@ -179,7 +169,17 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { numSelected } = props;
+    const { numSelected, selectedItems } = props;
+    
+    
+    const handleDeleteItems = () => {
+        const newRows = rows.filter( row => {
+            return selectedItems.map(item => item !== row.name)
+        })
+        console.log(newRows)
+        console.log('Click, res - ', selectedItems)
+        console.log(rows)
+    }
     
     return (
         <Toolbar
@@ -214,8 +214,8 @@ const EnhancedTableToolbar = (props) => {
             
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
-                    <IconButton>
-                        <DeleteIcon />
+                    <IconButton  onClick={handleDeleteItems} >
+                        <DeleteIcon/>
                     </IconButton>
                 </Tooltip>
             ) : (
@@ -258,6 +258,8 @@ export default function EnhancedTable() {
     
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
+        // console.log(selected)
+        // console.log(selectedIndex)
         let newSelected = [];
         
         if (selectedIndex === -1) {
@@ -298,7 +300,7 @@ export default function EnhancedTable() {
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar numSelected={selected.length} selectedItems={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
