@@ -23,16 +23,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
 
-//-----------------Personal functions--------------------
-
-
-
-
-
-
-//-------------------------------------------------------
-
-
 function createData(name, calories, fat, carbs, protein) {
     return {
         name,
@@ -134,7 +124,7 @@ function EnhancedTableHead(props) {
             <TableRow>
                 <TableCell padding="checkbox">
                     <Checkbox
-                        color="primary"
+                        color="secondary"
                         indeterminate={numSelected > 0 && numSelected < rowCount}
                         checked={rowCount > 0 && numSelected === rowCount}
                         onChange={onSelectAllClick}
@@ -179,8 +169,23 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { numSelected } = props;
+    const { numSelected, selectedItems } = props;
     
+    
+    
+    const handleDeleteItems = () => {
+
+        for (let value of selectedItems) {
+            rows.map((row, index) => {
+                if (row.name === value) {
+                    rows.splice(index, 1)  
+                }
+                return index
+            })
+        }
+        props.onRowsChange()
+    };
+
     return (
         <Toolbar
             sx={{
@@ -214,8 +219,8 @@ const EnhancedTableToolbar = (props) => {
             
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
-                    <IconButton>
-                        <DeleteIcon />
+                    <IconButton  onClick={handleDeleteItems} >
+                        <DeleteIcon/>
                     </IconButton>
                 </Tooltip>
             ) : (
@@ -240,6 +245,7 @@ export default function EnhancedTable() {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsChange, setRowsChange] = React.useState(false);
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -295,10 +301,17 @@ export default function EnhancedTable() {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
+    const hadleChangeRows = () => {
+        setRowsChange(!rowsChange)
+        if (selected.length > 0) {
+            setSelected(() => selected.splice(0, selected.length))
+        }
+    }
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar onRowsChange={hadleChangeRows} numSelected={selected.length} selectedItems={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
