@@ -172,15 +172,20 @@ const EnhancedTableToolbar = (props) => {
     const { numSelected, selectedItems } = props;
     
     
-    const handleDeleteItems = () => {
-        const newRows = rows.filter( row => {
-            return selectedItems.map(item => item !== row.name)
-        })
-        console.log(newRows)
-        console.log('Click, res - ', selectedItems)
-        console.log(rows)
-    }
     
+    const handleDeleteItems = () => {
+
+        for (let value of selectedItems) {
+            rows.map((row, index) => {
+                if (row.name === value) {
+                    rows.splice(index, 1)  
+                }
+                return index
+            })
+        }
+        props.onRowsChange()
+    };
+
     return (
         <Toolbar
             sx={{
@@ -240,6 +245,7 @@ export default function EnhancedTable() {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsChange, setRowsChange] = React.useState(false);
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -258,8 +264,6 @@ export default function EnhancedTable() {
     
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
-        // console.log(selected)
-        // console.log(selectedIndex)
         let newSelected = [];
         
         if (selectedIndex === -1) {
@@ -297,10 +301,14 @@ export default function EnhancedTable() {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
+    const handleChangeState = () => {
+        setRowsChange(!rowsChange)
+    }
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} selectedItems={selected} />
+                <EnhancedTableToolbar onRowsChange={handleChangeState} numSelected={selected.length} selectedItems={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
