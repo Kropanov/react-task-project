@@ -301,14 +301,17 @@ export default function EnhancedTable() {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
-    const handleChangeState = () => {
+    const hadleChangeRows = () => {
         setRowsChange(!rowsChange)
+        if (selected.length > 0) {
+            setSelected(() => selected.splice(0, selected.length))
+        }
     }
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar onRowsChange={handleChangeState} numSelected={selected.length} selectedItems={selected} />
+                <EnhancedTableToolbar onRowsChange={hadleChangeRows} numSelected={selected.length} selectedItems={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
