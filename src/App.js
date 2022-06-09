@@ -249,6 +249,15 @@ export default function EnhancedTable() {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [rowsChange, setRowsChange] = React.useState(false);
+    const [textFieldValues, setTextFieldValues] = React.useState(
+        {
+            Dessert: '',
+            Calories: '',
+            Fat: '',
+            Carbs: '',
+            Protein: ''
+        }
+    );
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -304,17 +313,36 @@ export default function EnhancedTable() {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
-    const hadleChangeRows = () => {
+    const handleChangeRows = () => {
         setRowsChange(!rowsChange)
         if (selected.length > 0) {
             setSelected(() => selected.splice(0, selected.length))
         }
     }
 
+    const handleChangeTextField = event => {
+        setTextFieldValues({
+            ...textFieldValues,
+            [event.target.name]: event.target.value
+        })
+    }
+
+    const handleClickAddElement = () => {
+        rows.push(createData(
+            textFieldValues.Dessert, 
+            +textFieldValues.Calories, 
+            +textFieldValues.Fat, 
+            +textFieldValues.Carbs, 
+            +textFieldValues.Protein
+            ))
+        handleChangeRows()
+        console.log(rows)
+    }   
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar onRowsChange={hadleChangeRows} numSelected={selected.length} selectedItems={selected} />
+                <EnhancedTableToolbar onRowsChange={handleChangeRows} numSelected={selected.length} selectedItems={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -399,12 +427,12 @@ export default function EnhancedTable() {
                 label="Dense padding"
             />
             <Paper sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: "row",position: 'fixed', bottom: 0, left: 0, right: 0, borderTop: '1px solid rgba(0,0,0, 0.25)' }} elevation={3}>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Dessert" variant="filled"/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Calories" variant="filled" type="number"/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Fat" variant="filled" type="number"/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Carbs" variant="filled"  type="number"/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Protein" variant="filled"  type="number"/>
-                <Button sx={{ width: '100%'}} variant="contained" disableElevation endIcon={<SendIcon />}>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Dessert" onChange={event => handleChangeTextField(event)} name="Dessert"  variant="filled" required/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Calories" onChange={event => handleChangeTextField(event)} name="Calories"  variant="filled" type="number" required/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Fat" onChange={event => handleChangeTextField(event)} name="Fat"  variant="filled" type="number" required/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Carbs" onChange={event => handleChangeTextField(event)} name="Carbs"  variant="filled"  type="number" required/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Protein" onChange={event => handleChangeTextField(event)} name="Protein" variant="filled"  type="number" required/>
+                <Button sx={{ width: '100%'}} onClick={handleClickAddElement} variant="contained" disableElevation endIcon={<SendIcon />}>
                     SEND
                 </Button>
             </Paper>
