@@ -24,6 +24,8 @@ import { visuallyHidden } from '@mui/utils';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
+import Alert from '@mui/material/Alert';
+import Collapse from '@mui/material/Collapse';
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -216,7 +218,7 @@ const EnhancedTableToolbar = (props) => {
                     id="tableTitle"
                     component="div"
                 >
-                    Dessert
+                    Desserts
                 </Typography>
             )}
             
@@ -258,6 +260,11 @@ export default function EnhancedTable() {
             Protein: ''
         }
     );
+    const [open, setOpen] = React.useState(true);
+    const [alertSuccess, setAlertSuccess] = React.useState(false);
+    const [alertWarning, setAlertWarning] = React.useState(false);
+    // A variable to find out if there is an element in rows
+    let isDessertLocatedInRows = undefined
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -327,16 +334,45 @@ export default function EnhancedTable() {
         })
     }
 
+    const cleanTextFieldValues = () => {
+        setTextFieldValues({
+            Dessert: '',
+            Calories: '',
+            Fat: '',
+            Carbs: '',
+            Protein: ''
+        })
+    }
+
     const handleClickAddElement = () => {
-        rows.push(createData(
-            textFieldValues.Dessert, 
-            +textFieldValues.Calories, 
-            +textFieldValues.Fat, 
-            +textFieldValues.Carbs, 
-            +textFieldValues.Protein
+        isDessertLocatedInRows = false
+
+        rows.map((row, index) => {
+            if (row.name === textFieldValues.Dessert) {
+                isDessertLocatedInRows = true
+            }
+            return index
+        })
+        
+        if (!isDessertLocatedInRows) {
+            rows.push(createData(
+                textFieldValues.Dessert, 
+                +textFieldValues.Calories, 
+                +textFieldValues.Fat, 
+                +textFieldValues.Carbs, 
+                +textFieldValues.Protein
             ))
-        handleChangeRows()
-        console.log(rows)
+            setAlertSuccess(true)
+            setAlertWarning(false)
+        } else {
+            setAlertSuccess(false)
+            setAlertWarning(true)
+        }
+        
+        // to update after forced closure
+        setOpen(true)
+        // clearing text fields
+        cleanTextFieldValues()
     }   
 
     return (
@@ -423,15 +459,89 @@ export default function EnhancedTable() {
                 />
             </Paper>
             <FormControlLabel
+                sx={{marginBottom: '100px'}}
                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                 label="Dense padding"
             />
+            { alertSuccess
+                ?
+                    <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
+                        <Collapse in={open}>
+                            <Alert variant="outlined" severity="success" onClose={() => {setOpen(false);}}>
+                                Dessert has been added to the table!
+                            </Alert>
+                        </Collapse>
+                    </Paper>
+                : 
+                    null
+            }
+            { alertWarning
+                ?
+                    <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
+                        <Collapse in={open}>
+                            <Alert variant="outlined" severity="warning" onClose={() => {setOpen(false);}}>
+                                This dessert is already available in the table!
+                            </Alert>
+                        </Collapse>
+                    </Paper>
+                : 
+                    null
+            }
             <Paper sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: "row",position: 'fixed', bottom: 0, left: 0, right: 0, borderTop: '1px solid rgba(0,0,0, 0.25)' }} elevation={3}>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Dessert" onChange={event => handleChangeTextField(event)} name="Dessert"  variant="filled" required/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Calories" onChange={event => handleChangeTextField(event)} name="Calories"  variant="filled" type="number" required/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Fat" onChange={event => handleChangeTextField(event)} name="Fat"  variant="filled" type="number" required/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Carbs" onChange={event => handleChangeTextField(event)} name="Carbs"  variant="filled"  type="number" required/>
-                <TextField sx={{ width: '100%'}} id="filled-basic" label="Protein" onChange={event => handleChangeTextField(event)} name="Protein" variant="filled"  type="number" required/>
+                <TextField 
+                    sx={{ width: '100%'}} 
+                    id="filled-basic" 
+                    label="Dessert" 
+                    value={textFieldValues.Dessert}
+                    onChange={event => handleChangeTextField(event)} 
+                    name="Dessert"  
+                    variant="filled" 
+                    required
+                />
+                <TextField 
+                    sx={{ width: '100%'}} 
+                    id="filled-basic" 
+                    label="Calories" 
+                    value={textFieldValues.Calories}
+                    onChange={event => handleChangeTextField(event)} 
+                    name="Calories"  
+                    variant="filled" 
+                    type="number" 
+                    required
+                />
+                <TextField 
+                    sx={{ width: '100%'}} 
+                    id="filled-basic" 
+                    label="Fat" 
+                    value={textFieldValues.Fat}
+                    onChange={event => handleChangeTextField(event)} 
+                    name="Fat"  
+                    variant="filled" 
+                    type="number" 
+                    required
+                />
+                <TextField 
+                    sx={{ width: '100%'}} 
+                    id="filled-basic" 
+                    label="Carbs" 
+                    value={textFieldValues.Carbs}
+                    onChange={event => handleChangeTextField(event)} 
+                    name="Carbs"  
+                    variant="filled" 
+                    type="number" 
+                    required
+                />
+                <TextField 
+                    sx={{ width: '100%'}} 
+                    id="filled-basic" 
+                    label="Protein"
+                    value={textFieldValues.Protein}
+                    onChange={event => handleChangeTextField(event)} 
+                    name="Protein" 
+                    variant="filled"
+                    type="number" 
+                    required
+                />
                 <Button sx={{ width: '100%'}} onClick={handleClickAddElement} variant="contained" disableElevation endIcon={<SendIcon />}>
                     SEND
                 </Button>
