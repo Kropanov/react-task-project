@@ -21,6 +21,9 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import SendIcon from '@mui/icons-material/Send';
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -213,7 +216,7 @@ const EnhancedTableToolbar = (props) => {
                     id="tableTitle"
                     component="div"
                 >
-                    React Table
+                    Dessert
                 </Typography>
             )}
             
@@ -395,6 +398,16 @@ export default function EnhancedTable() {
                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                 label="Dense padding"
             />
+            <Paper sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: "row",position: 'fixed', bottom: 0, left: 0, right: 0, borderTop: '1px solid rgba(0,0,0, 0.25)' }} elevation={3}>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Dessert" variant="filled"/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Calories" variant="filled" type="number"/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Fat" variant="filled" type="number"/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Carbs" variant="filled"  type="number"/>
+                <TextField sx={{ width: '100%'}} id="filled-basic" label="Protein" variant="filled"  type="number"/>
+                <Button sx={{ width: '100%'}} variant="contained" disableElevation endIcon={<SendIcon />}>
+                    SEND
+                </Button>
+            </Paper>
         </Box>
     );
 }
