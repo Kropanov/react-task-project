@@ -10,13 +10,12 @@ import Checkbox from "@mui/material/Checkbox";
 import TablePagination from "@mui/material/TablePagination";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import Collapse from "@mui/material/Collapse";
-import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
 import EnhancedTableToolbar from "../EnhancedTableToolbar/EnhancedTableToolbar"
 import EnhancedTableHead from "../EnhancedTableHead/EnhancedTableHead"
+import Alerts from "./Alerts/Alerts";
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -90,15 +89,18 @@ export default function EnhancedTable() {
         }
     );
     const [open, setOpen] = React.useState(true);
-    const [alertSuccess, setAlertSuccess] = React.useState(false);
-    const [alertError, setAlertError] = React.useState(false);
-    const [alertWarning, setAlertWarning] = React.useState(false);
-    const [alertEdit, setAlertEdit] = React.useState(false);
+    const [alerts, setAlerts] = React.useState({
+        alertAddSuccess: false,
+        alertAddError: false,
+        alertAddWarning: false,
+        alertEditWarning: false,
+        alertEditInfo: false
+    })
     // A variable to find out if there is an element in rows
     let isDessertLocatedInRows = undefined
     // check: is editing taking place
     const [isEditing, setIsEditing] = React.useState(false);
-    const [indexItem, setIndexItem] = React.useState(0);
+    const [indexItem, setIndexItem] = React.useState(0); // index for editing
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -186,18 +188,19 @@ export default function EnhancedTable() {
             textFieldValues.Carbs === '' ||
             textFieldValues.Protein === '') {
             
-            setAlertSuccess(false)
-            setAlertWarning(false)
-            setAlertEdit(false)
-            setAlertError(true)
+            setAlerts({
+                alertAddSuccess: false,
+                alertAddError: true,
+                alertAddWarning: false,
+                alertEditWarning: false,
+                alertEditInfo: false
+            })
             
             // to update after forced closure
             setOpen(true)
             
             return
         }
-        
-        setAlertError(false)
         
         if (isEditing) {
             
@@ -208,10 +211,13 @@ export default function EnhancedTable() {
                 +textFieldValues.Carbs,
                 +textFieldValues.Protein
             )
-            
-            setAlertSuccess(false)
-            setAlertWarning(false)
-            setAlertEdit(true)
+            setAlerts({
+                alertAddSuccess: false,
+                alertAddError: false,
+                alertAddWarning: false,
+                alertEditWarning: false,
+                alertEditInfo: true
+            })
             
             setIsEditing(false)
             
@@ -222,8 +228,8 @@ export default function EnhancedTable() {
             
             return
         }
+    
         
-        setAlertEdit(false)
         
         isDessertLocatedInRows = false
         
@@ -242,11 +248,21 @@ export default function EnhancedTable() {
                 +textFieldValues.Carbs,
                 +textFieldValues.Protein
             ))
-            setAlertSuccess(true)
-            setAlertWarning(false)
+            setAlerts({
+                alertAddSuccess: true,
+                alertAddError: false,
+                alertAddWarning: false,
+                alertEditWarning: false,
+                alertEditInfo: false
+            })
         } else {
-            setAlertSuccess(false)
-            setAlertWarning(true)
+            setAlerts({
+                alertAddSuccess: false,
+                alertAddError: false,
+                alertAddWarning: true,
+                alertEditWarning: false,
+                alertEditInfo: false
+            })
         }
         
         // to update after forced closure
@@ -276,6 +292,7 @@ export default function EnhancedTable() {
                     selectedItems={selected}
                     onClickEdit={(item, index) => handleClickEdit(item, index)}
                     rows={rows}
+                    onEditAlerts={() => setAlerts({...alerts, alertEditWarning: true,})}
                 />
                 <TableContainer>
                     <Table
@@ -361,66 +378,11 @@ export default function EnhancedTable() {
                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                 label="Dense padding"
             />
-            { alertSuccess
-                ?
-                <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
-                    <Collapse in={open}>
-                        <Alert variant="outlined" severity="success" onClose={() => {setOpen(false);}}>
-                            Dessert has been added to the table!
-                        </Alert>
-                    </Collapse>
-                </Paper>
-                :
-                null
-            }
-            { alertWarning
-                ?
-                <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
-                    <Collapse in={open}>
-                        <Alert variant="outlined" severity="warning" onClose={() => {setOpen(false);}}>
-                            This dessert is already available in the table!
-                        </Alert>
-                    </Collapse>
-                </Paper>
-                :
-                null
-            }
-            { alertError
-                ?
-                <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
-                    <Collapse in={open}>
-                        <Alert variant="outlined" severity="error" onClose={() => {setOpen(false);}}>
-                            Error! Fill in all required fields.
-                        </Alert>
-                    </Collapse>
-                </Paper>
-                :
-                null
-            }
-            { alertEdit
-                ?
-                <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
-                    <Collapse in={open}>
-                        <Alert variant="outlined" severity="info" onClose={() => {setOpen(false);}}>
-                            The dessert in the table has been changed!
-                        </Alert>
-                    </Collapse>
-                </Paper>
-                :
-                null
-            }
-            { selected.length > 1
-                ?
-                <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
-                    <Collapse in={open}>
-                        <Alert variant="outlined" severity="warning" onClose={() => {setOpen(false);}}>
-                            Warning! Only one dessert can be edited.
-                        </Alert>
-                    </Collapse>
-                </Paper>
-                :
-                null
-            }
+            <Alerts
+                open={open}
+                setOpen={() => setOpen(false)}
+                alerts={alerts}
+            />
             <Paper sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: "row",position: 'fixed', bottom: 0, left: 0, right: 0, borderTop: '1px solid rgba(0,0,0, 0.25)' }} elevation={3}>
                 <TextField
                     sx={{ width: '100%'}}

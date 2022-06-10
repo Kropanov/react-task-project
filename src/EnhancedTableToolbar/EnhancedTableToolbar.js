@@ -14,6 +14,7 @@ const EnhancedTableToolbar = (props) => {
     
     const handleEditItem = () => {
         if (numSelected > 1) {
+            props.onEditAlerts()
             return
         }
         
