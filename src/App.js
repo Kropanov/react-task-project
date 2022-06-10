@@ -26,6 +26,7 @@ import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
+import EditIcon from '@mui/icons-material/Edit';
 
 
 function createData(name, calories, fat, carbs, protein) {
@@ -174,9 +175,28 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { numSelected, selectedItems } = props;
+    const { numSelected, selectedItems} = props;
+    const [open, setOpen] = React.useState(false);
     
-    
+    const handleEditItem = () => {
+        if (numSelected > 1) {
+            setOpen(true)
+            return
+        }
+
+        let editItem = null
+        let indexItem = null
+
+        rows.map((row, index) => {
+            if (row.name === selectedItems[0]) {
+                editItem = rows[index]
+                indexItem = index
+            }
+            return index
+        })
+
+        props.onClickEdit(editItem, indexItem)
+    }
     
     const handleDeleteItems = () => {
 
@@ -223,11 +243,18 @@ const EnhancedTableToolbar = (props) => {
             )}
             
             {numSelected > 0 ? (
-                <Tooltip title="Delete">
-                    <IconButton  onClick={handleDeleteItems} >
-                        <DeleteIcon/>
-                    </IconButton>
-                </Tooltip>
+                <>
+                    <Tooltip title="Edit">
+                        <IconButton onClick={handleEditItem}>
+                            <EditIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                        <IconButton onClick={handleDeleteItems} >
+                            <DeleteIcon/>
+                        </IconButton>
+                    </Tooltip>
+                </>
             ) : (
                 <Tooltip title="Filter list">
                     <IconButton>
@@ -235,6 +262,18 @@ const EnhancedTableToolbar = (props) => {
                     </IconButton>
                 </Tooltip>
             )}
+            { numSelected > 1
+                ?
+                    <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
+                        <Collapse in={open}>
+                            <Alert variant="outlined" severity="warning" onClose={() => {setOpen(false);}}>
+                                Warning! Only one dessert can be edited.
+                            </Alert>
+                        </Collapse>
+                    </Paper>
+                : 
+                    null
+            }
         </Toolbar>
     );
 };
@@ -264,9 +303,13 @@ export default function EnhancedTable() {
     const [alertSuccess, setAlertSuccess] = React.useState(false);
     const [alertError, setAlertError] = React.useState(false);
     const [alertWarning, setAlertWarning] = React.useState(false);
+    const [alertEdit, setAlertEdit] = React.useState(false);
     // A variable to find out if there is an element in rows
     let isDessertLocatedInRows = undefined
-    
+    // check: is editing taking place
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [indexItem, setIndexItem] = React.useState(0);
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -355,6 +398,7 @@ export default function EnhancedTable() {
             
             setAlertSuccess(false)
             setAlertWarning(false)
+            setAlertEdit(false)
             setAlertError(true)
 
             // to update after forced closure
@@ -364,6 +408,32 @@ export default function EnhancedTable() {
         }
 
         setAlertError(false)
+
+        if (isEditing) {
+
+            rows[indexItem] = createData(
+                textFieldValues.Dessert, 
+                +textFieldValues.Calories, 
+                +textFieldValues.Fat, 
+                +textFieldValues.Carbs, 
+                +textFieldValues.Protein
+            )
+
+            setAlertSuccess(false)
+            setAlertWarning(false)
+            setAlertEdit(true)
+
+            setIsEditing(false)
+
+            // to update after forced closure
+            setOpen(true)
+            // clearing text fields
+            cleanTextFieldValues()
+            
+            return
+        }
+
+        setAlertEdit(false)
 
         isDessertLocatedInRows = false
 
@@ -395,10 +465,27 @@ export default function EnhancedTable() {
         cleanTextFieldValues()
     }   
 
+    const handleClickEdit = (item, index) => {
+        const {name, calories, fat, carbs, protein} = item
+        setIndexItem(index)
+        textFieldValues.Dessert = name 
+        textFieldValues.Calories = calories
+        textFieldValues.Fat = fat
+        textFieldValues.Carbs = carbs
+        textFieldValues.Protein = protein
+        handleChangeRows()
+        setIsEditing(true)
+    }
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar onRowsChange={handleChangeRows} numSelected={selected.length} selectedItems={selected} />
+                <EnhancedTableToolbar 
+                    onRowsChange={handleChangeRows} 
+                    numSelected={selected.length} 
+                    selectedItems={selected}
+                    onClickEdit={(item, index) => handleClickEdit(item, index)} 
+                />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -512,7 +599,19 @@ export default function EnhancedTable() {
                     <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
                         <Collapse in={open}>
                             <Alert variant="outlined" severity="error" onClose={() => {setOpen(false);}}>
-                            Error! Fill in all required fields.
+                                Error! Fill in all required fields.
+                            </Alert>
+                        </Collapse>
+                    </Paper>
+                : 
+                    null
+            }
+            { alertEdit
+                ?
+                    <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
+                        <Collapse in={open}>
+                            <Alert variant="outlined" severity="info" onClose={() => {setOpen(false);}}>
+                                The dessert in the table has been changed!
                             </Alert>
                         </Collapse>
                     </Paper>
