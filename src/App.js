@@ -262,6 +262,7 @@ export default function EnhancedTable() {
     );
     const [open, setOpen] = React.useState(true);
     const [alertSuccess, setAlertSuccess] = React.useState(false);
+    const [alertError, setAlertError] = React.useState(false);
     const [alertWarning, setAlertWarning] = React.useState(false);
     // A variable to find out if there is an element in rows
     let isDessertLocatedInRows = undefined
@@ -345,6 +346,25 @@ export default function EnhancedTable() {
     }
 
     const handleClickAddElement = () => {
+
+        if (textFieldValues.Dessert === '' ||
+            textFieldValues.Calories === '' ||
+            textFieldValues.Fat === '' ||
+            textFieldValues.Carbs === '' ||
+            textFieldValues.Protein === '') {
+            
+            setAlertSuccess(false)
+            setAlertWarning(false)
+            setAlertError(true)
+
+            // to update after forced closure
+            setOpen(true)
+
+            return 
+        }
+
+        setAlertError(false)
+
         isDessertLocatedInRows = false
 
         rows.map((row, index) => {
@@ -481,6 +501,18 @@ export default function EnhancedTable() {
                         <Collapse in={open}>
                             <Alert variant="outlined" severity="warning" onClose={() => {setOpen(false);}}>
                                 This dessert is already available in the table!
+                            </Alert>
+                        </Collapse>
+                    </Paper>
+                : 
+                    null
+            }
+            { alertError
+                ?
+                    <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
+                        <Collapse in={open}>
+                            <Alert variant="outlined" severity="error" onClose={() => {setOpen(false);}}>
+                            Error! Fill in all required fields.
                             </Alert>
                         </Collapse>
                     </Paper>
