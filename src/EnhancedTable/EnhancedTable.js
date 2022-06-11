@@ -10,12 +10,16 @@ import Checkbox from "@mui/material/Checkbox";
 import TablePagination from "@mui/material/TablePagination";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import SendIcon from "@mui/icons-material/Send";
-import EnhancedTableToolbar from "../EnhancedTableToolbar/EnhancedTableToolbar"
-import EnhancedTableHead from "../EnhancedTableHead/EnhancedTableHead"
+import EnhancedTableToolbar from "./EnhancedTableToolbar/EnhancedTableToolbar"
+import EnhancedTableHead from "./EnhancedTableHead/EnhancedTableHead"
 import Alerts from "./Alerts/Alerts";
+import FormForAddEdit from "./FormForAddEdit/FormForAddEdit";
+
+// constants severity levels
+const info = 'info'
+const warning = 'warning'
+const success = 'success'
+const error = 'error'
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -88,13 +92,10 @@ export default function EnhancedTable() {
             Protein: ''
         }
     );
-    const [open, setOpen] = React.useState(true);
-    const [alerts, setAlerts] = React.useState({
-        alertAddSuccess: false,
-        alertAddError: false,
-        alertAddWarning: false,
-        alertEditWarning: false,
-        alertEditInfo: false
+    const [open, setOpen] = React.useState(false);
+    const [alert, setAlert] = React.useState({
+        level: '',
+        message: '',
     })
     // A variable to find out if there is an element in rows
     let isDessertLocatedInRows = undefined
@@ -188,15 +189,11 @@ export default function EnhancedTable() {
             textFieldValues.Carbs === '' ||
             textFieldValues.Protein === '') {
             
-            setAlerts({
-                alertAddSuccess: false,
-                alertAddError: true,
-                alertAddWarning: false,
-                alertEditWarning: false,
-                alertEditInfo: false
+            setAlert({
+                level: error,
+                message: 'Error! Fill in all required fields.'
             })
             
-            // to update after forced closure
             setOpen(true)
             
             return
@@ -211,25 +208,20 @@ export default function EnhancedTable() {
                 +textFieldValues.Carbs,
                 +textFieldValues.Protein
             )
-            setAlerts({
-                alertAddSuccess: false,
-                alertAddError: false,
-                alertAddWarning: false,
-                alertEditWarning: false,
-                alertEditInfo: true
+            setAlert({
+                level: info,
+                message: 'The element in the table has been changed!'
             })
             
             setIsEditing(false)
             
-            // to update after forced closure
-            setOpen(true)
             // clearing text fields
             cleanTextFieldValues()
-            
+            setOpen(true)
+    
+    
             return
         }
-    
-        
         
         isDessertLocatedInRows = false
         
@@ -248,24 +240,17 @@ export default function EnhancedTable() {
                 +textFieldValues.Carbs,
                 +textFieldValues.Protein
             ))
-            setAlerts({
-                alertAddSuccess: true,
-                alertAddError: false,
-                alertAddWarning: false,
-                alertEditWarning: false,
-                alertEditInfo: false
+            setAlert({
+                level: success,
+                message: 'Element has been added to the table!'
             })
         } else {
-            setAlerts({
-                alertAddSuccess: false,
-                alertAddError: false,
-                alertAddWarning: true,
-                alertEditWarning: false,
-                alertEditInfo: false
+            setAlert({
+                level: warning,
+                message: 'This element is already available in the table!'
             })
         }
-        
-        // to update after forced closure
+    
         setOpen(true)
         // clearing text fields
         cleanTextFieldValues()
@@ -292,7 +277,13 @@ export default function EnhancedTable() {
                     selectedItems={selected}
                     onClickEdit={(item, index) => handleClickEdit(item, index)}
                     rows={rows}
-                    onEditAlerts={() => setAlerts({...alerts, alertEditWarning: true,})}
+                    onEditAlerts={() => {
+                        setAlert({
+                            level: warning,
+                            message: 'Warning! Only one element can be edited.'
+                        })
+                        setOpen(true)
+                    }}
                 />
                 <TableContainer>
                     <Table
@@ -379,69 +370,16 @@ export default function EnhancedTable() {
                 label="Dense padding"
             />
             <Alerts
+                level={alert.level}
+                message={alert.message}
                 open={open}
                 setOpen={() => setOpen(false)}
-                alerts={alerts}
             />
-            <Paper sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: "row",position: 'fixed', bottom: 0, left: 0, right: 0, borderTop: '1px solid rgba(0,0,0, 0.25)' }} elevation={3}>
-                <TextField
-                    sx={{ width: '100%'}}
-                    id="filled-basic"
-                    label="Dessert"
-                    value={textFieldValues.Dessert}
-                    onChange={event => handleChangeTextField(event)}
-                    name="Dessert"
-                    variant="filled"
-                    required
-                />
-                <TextField
-                    sx={{ width: '100%'}}
-                    id="filled-basic"
-                    label="Calories"
-                    value={textFieldValues.Calories}
-                    onChange={event => handleChangeTextField(event)}
-                    name="Calories"
-                    variant="filled"
-                    type="number"
-                    required
-                />
-                <TextField
-                    sx={{ width: '100%'}}
-                    id="filled-basic"
-                    label="Fat"
-                    value={textFieldValues.Fat}
-                    onChange={event => handleChangeTextField(event)}
-                    name="Fat"
-                    variant="filled"
-                    type="number"
-                    required
-                />
-                <TextField
-                    sx={{ width: '100%'}}
-                    id="filled-basic"
-                    label="Carbs"
-                    value={textFieldValues.Carbs}
-                    onChange={event => handleChangeTextField(event)}
-                    name="Carbs"
-                    variant="filled"
-                    type="number"
-                    required
-                />
-                <TextField
-                    sx={{ width: '100%'}}
-                    id="filled-basic"
-                    label="Protein"
-                    value={textFieldValues.Protein}
-                    onChange={event => handleChangeTextField(event)}
-                    name="Protein"
-                    variant="filled"
-                    type="number"
-                    required
-                />
-                <Button sx={{ width: '100%'}} onClick={handleClickAddElement} variant="contained" disableElevation endIcon={<SendIcon />}>
-                    SEND
-                </Button>
-            </Paper>
+            <FormForAddEdit
+                textFieldValues={textFieldValues}
+                onChangeTextField={event => handleChangeTextField(event)}
+                onClickAddElement={handleClickAddElement}
+            />
         </Box>
     );
 }
