@@ -94,14 +94,15 @@ export default function EnhancedTable() {
     );
     const [open, setOpen] = React.useState(false);
     const [alert, setAlert] = React.useState({
-        level: '',
-        message: '',
+        level: info,
+        message: 'This is a table that you can edit',
     })
+    
     // A variable to find out if there is an element in rows
     let isDessertLocatedInRows = undefined
-    // check: is editing taking place
-    const [isEditing, setIsEditing] = React.useState(false);
-    const [indexItem, setIndexItem] = React.useState(0); // index for editing
+    
+    const [isEditing, setIsEditing] = React.useState(false); // check: is editing taking place
+    const [indexItem, setIndexItem] = React.useState(0);     // index for editing
     
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -158,17 +159,16 @@ export default function EnhancedTable() {
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
     const handleChangeRows = () => {
-        setRowsChange(!rowsChange)
-        if (selected.length > 0) {
-            setSelected(() => selected.splice(0, selected.length))
-        }
+        setRowsChange((prev) => !prev)
+        setSelected(() => selected.splice(0, selected.length))
+        console.log(rowsChange)
     }
     
     const handleChangeTextField = event => {
-        setTextFieldValues({
-            ...textFieldValues,
+        setTextFieldValues((prev) => ({
+            ...prev,
             [event.target.name]: event.target.value
-        })
+        }))
     }
     
     const cleanTextFieldValues = () => {
@@ -258,13 +258,15 @@ export default function EnhancedTable() {
     
     const handleClickEdit = (item, index) => {
         const {name, calories, fat, carbs, protein} = item
-        setIndexItem(index)
-        textFieldValues.Dessert = name
-        textFieldValues.Calories = calories
-        textFieldValues.Fat = fat
-        textFieldValues.Carbs = carbs
-        textFieldValues.Protein = protein
+        setTextFieldValues({
+            Dessert: name,
+            Calories: calories,
+            Fat: fat,
+            Carbs: carbs,
+            Protein: protein
+        })
         handleChangeRows()
+        setIndexItem(index)
         setIsEditing(true)
     }
     
