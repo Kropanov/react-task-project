@@ -1,9 +1,9 @@
 import * as React from 'react';
-import EnhancedTable from "./EnhancedTable/EnhancedTable";
+import BasicTabs from "./Tabs/Tabs";
 
 function App() {
     return (
-        <EnhancedTable/>
+        <BasicTabs/>
     )
 }
 
