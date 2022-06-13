@@ -10,11 +10,11 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import PropTypes from "prop-types";
 
 const EnhancedTableToolbar = (props) => {
-    const { numSelected, selectedItems, rows} = props;
+    const { numSelected, selectedItems, rows, onEditAlert, onDeleteAlert, onRowsChange, onClickEdit} = props;
     
     const handleEditItem = () => {
         if (numSelected > 1) {
-            props.onEditAlerts()
+            onEditAlert()
             return
         }
         
@@ -29,7 +29,7 @@ const EnhancedTableToolbar = (props) => {
             return index
         })
         
-        props.onClickEdit(editItem, indexItem)
+        onClickEdit(editItem, indexItem)
     }
     
     const handleDeleteItems = () => {
@@ -42,7 +42,8 @@ const EnhancedTableToolbar = (props) => {
                 return index
             })
         }
-        props.onRowsChange()
+        onDeleteAlert()
+        onRowsChange()
     };
     
     return (

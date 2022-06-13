@@ -14,12 +14,8 @@ import EnhancedTableToolbar from "./EnhancedTableToolbar/EnhancedTableToolbar"
 import EnhancedTableHead from "./EnhancedTableHead/EnhancedTableHead"
 import Alerts from "./Alerts/Alerts";
 import FormForAddEdit from "./FormForAddEdit/FormForAddEdit";
-
-// constants severity levels
-const info = 'info'
-const warning = 'warning'
-const success = 'success'
-const error = 'error'
+import {getComparator, stableSort} from "./Sorting/Sorting";
+import {error, info, success, warning} from "./SeverityLevels/SeverityLevels";
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -46,34 +42,6 @@ const rows = [
     createData('Nougat', 360, 19.0, 9, 37.0),
     createData('Oreo', 437, 18.0, 63, 4.0),
 ];
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
 
 export default function EnhancedTable() {
     const [order, setOrder] = React.useState('asc');
@@ -277,10 +245,17 @@ export default function EnhancedTable() {
                     selectedItems={selected}
                     onClickEdit={(item, index) => handleClickEdit(item, index)}
                     rows={rows}
-                    onEditAlerts={() => {
+                    onEditAlert={() => {
                         setAlert({
                             level: warning,
                             message: 'Warning! Only one element can be edited.'
+                        })
+                        setOpen(true)
+                    }}
+                    onDeleteAlert={() => {
+                        setAlert({
+                            level: info,
+                            message: 'The items was removed from the table.'
                         })
                         setOpen(true)
                     }}

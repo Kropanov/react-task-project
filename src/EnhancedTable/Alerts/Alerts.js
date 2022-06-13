@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import Paper from "@mui/material/Paper";
 import Collapse from "@mui/material/Collapse";
 import Alert from "@mui/material/Alert";
@@ -10,6 +10,16 @@ import Alert from "@mui/material/Alert";
 // Warning! Only one element can be edited. | warning
 
 const Alerts = ({ level, message, open, setOpen })  => {
+    useEffect(() => {
+        const timeId = setTimeout(() => {
+            setOpen()
+        }, 3000)
+        
+        return () => {
+            clearTimeout(timeId)
+        }
+    });
+    
     return (
         <Paper sx={{position: 'fixed', right: 0, bottom: 70}}>
             <Collapse in={open}>
