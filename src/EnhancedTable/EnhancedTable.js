@@ -92,6 +92,12 @@ export default function EnhancedTable() {
             Protein: ''
         }
     );
+    const validation =  textFieldValues.Dessert === '' ||
+                        textFieldValues.Calories === '' ||
+                        textFieldValues.Fat === '' ||
+                        textFieldValues.Carbs === '' ||
+                        textFieldValues.Protein === ''
+    
     const [open, setOpen] = React.useState(false);
     const [alert, setAlert] = React.useState({
         level: info,
@@ -99,7 +105,7 @@ export default function EnhancedTable() {
     })
     
     // A variable to find out if there is an element in rows
-    let isDessertLocatedInRows = undefined
+    let isElementLocatedInRows = undefined
     
     const [isEditing, setIsEditing] = React.useState(false); // check: is editing taking place
     const [indexItem, setIndexItem] = React.useState(0);     // index for editing
@@ -181,58 +187,42 @@ export default function EnhancedTable() {
         })
     }
     
-    const handleClickAddElement = () => {
-        
-        if (textFieldValues.Dessert === '' ||
-            textFieldValues.Calories === '' ||
-            textFieldValues.Fat === '' ||
-            textFieldValues.Carbs === '' ||
-            textFieldValues.Protein === '') {
-            
-            setAlert({
-                level: error,
-                message: 'Error! Fill in all required fields.'
-            })
-            
-            setOpen(true)
-            
-            return
-        }
-        
-        if (isEditing) {
-            
-            rows[indexItem] = createData(
-                textFieldValues.Dessert,
-                +textFieldValues.Calories,
-                +textFieldValues.Fat,
-                +textFieldValues.Carbs,
-                +textFieldValues.Protein
-            )
-            setAlert({
-                level: info,
-                message: 'The element in the table has been changed!'
-            })
-            
-            setIsEditing(false)
-            
-            // clearing text fields
-            cleanTextFieldValues()
-            setOpen(true)
+    const validateTextFields = () => {
+        setAlert({
+            level: error,
+            message: 'Error! Fill in all required fields.'
+        })
+    }
     
+    const editElementFunction = () => {
+        rows[indexItem] = createData(
+            textFieldValues.Dessert,
+            +textFieldValues.Calories,
+            +textFieldValues.Fat,
+            +textFieldValues.Carbs,
+            +textFieldValues.Protein
+        )
+        
+        setAlert({
+            level: info,
+            message: 'The element in the table has been changed!'
+        })
     
-            return
-        }
-        
-        isDessertLocatedInRows = false
-        
+        setIsEditing(false)
+        cleanTextFieldValues()
+    }
+    
+    const addElementFunction = () => {
+        isElementLocatedInRows = false
+    
         rows.map((row, index) => {
             if (row.name === textFieldValues.Dessert) {
-                isDessertLocatedInRows = true
+                isElementLocatedInRows = true
             }
             return index
         })
-        
-        if (!isDessertLocatedInRows) {
+    
+        if (!isElementLocatedInRows) {
             rows.push(createData(
                 textFieldValues.Dessert,
                 +textFieldValues.Calories,
@@ -250,10 +240,18 @@ export default function EnhancedTable() {
                 message: 'This element is already available in the table!'
             })
         }
-    
-        setOpen(true)
-        // clearing text fields
         cleanTextFieldValues()
+    }
+    
+    const handleClickButton = () => {
+        if (validation) {
+            validateTextFields()
+        } else if (isEditing) {
+            editElementFunction()
+        } else {
+            addElementFunction()
+        }
+        setOpen(true)
     }
     
     const handleClickEdit = (item, index) => {
@@ -380,7 +378,7 @@ export default function EnhancedTable() {
             <FormForAddEdit
                 textFieldValues={textFieldValues}
                 onChangeTextField={event => handleChangeTextField(event)}
-                onClickAddElement={handleClickAddElement}
+                onClickButton={handleClickButton}
             />
         </Box>
     );
