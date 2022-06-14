@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import BasicTabs from "./Tabs/Tabs";
 
 function App() {
@@ -8,14 +8,3 @@ function App() {
 }
 
 export default App
-
-
-
-
-
-
-
-
-
-
-

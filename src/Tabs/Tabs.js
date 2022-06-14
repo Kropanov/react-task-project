@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -39,10 +39,32 @@ function a11yProps(index) {
 
 export default function BasicTabs() {
     const [value, setValue] = React.useState(0);
+    const [data, setData] = useState([])
+
+    useEffect( () => {
+        const getData = async (req) => {
+            return await fetch(req).then((response) => {
+                console.log('Rendering data')
+                response.json().then((data) => {
+                    setData((prev) => ([
+                        ...prev,
+                        data.data
+                    ]))
+                }).catch((err) => {
+                    console.log(err);
+                })
+            });
+        }
+        getData('https://kitsu.io/api/edge/anime');
+        getData('https://kitsu.io/api/edge/manga');
+        getData('https://kitsu.io/api/edge/categories');
+      }, []);
     
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    console.log(data)
     
     return (
         <Box sx={{ width: '100%' }}>
@@ -53,17 +75,11 @@ export default function BasicTabs() {
                     <Tab label="Table Three" {...a11yProps(2)} />
                 </Tabs>
             </Box>
-            <TabPanel value={value} index={0}>
-                <EnhancedTable/>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                {/*<EnhancedTable/>*/}
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                {/*<EnhancedTable/>*/}
-            </TabPanel>
+            { data.map((item , index) => (
+                <TabPanel value={value} index={index} key={index}>
+                    {data != null ? <EnhancedTable data={item}/> : "Загрузка..."}
+                </TabPanel>
+            )) }
         </Box>
     );
 }
-
-//<EnhancedTable/>

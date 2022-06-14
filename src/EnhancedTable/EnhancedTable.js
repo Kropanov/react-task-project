@@ -43,7 +43,8 @@ const rows = [
     createData('Oreo', 437, 18.0, 63, 4.0),
 ];
 
-export default function EnhancedTable() {
+export default function EnhancedTable(props) {
+    console.log(props)
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -254,7 +255,7 @@ export default function EnhancedTable() {
                     }}
                     onDeleteAlert={() => {
                         setAlert({
-                            level: info,
+                            level: warning,
                             message: 'The items was removed from the table.'
                         })
                         setOpen(true)
