@@ -64,7 +64,7 @@ export default function BasicTabs() {
         setValue(newValue);
     };
 
-    console.log(data)
+    // console.log(data)
     
     return (
         <Box sx={{ width: '100%' }}>
@@ -77,7 +77,7 @@ export default function BasicTabs() {
             </Box>
             { data.map((item , index) => (
                 <TabPanel value={value} index={index} key={index}>
-                    {data != null ? <EnhancedTable data={item}/> : "Загрузка..."}
+                    {data != null ? <EnhancedTable indexTable={index} dataStore={data} /> : "Загрузка..."}
                 </TabPanel>
             )) }
         </Box>

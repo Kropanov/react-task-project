@@ -8,8 +8,6 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Checkbox from "@mui/material/Checkbox";
 import TablePagination from "@mui/material/TablePagination";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import EnhancedTableToolbar from "./EnhancedTableToolbar/EnhancedTableToolbar"
 import EnhancedTableHead from "./EnhancedTableHead/EnhancedTableHead"
 import Alerts from "./Alerts/Alerts";
@@ -27,31 +25,48 @@ function createData(name, calories, fat, carbs, protein) {
     };
 }
 
-const rows = [
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Donut', 452, 25.0, 51, 4.9),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Honeycomb', 408, 3.2, 87, 6.5),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Jelly Bean', 375, 0.0, 94, 0.0),
-    createData('KitKat', 518, 26.0, 65, 7.0),
-    createData('Lollipop', 392, 0.2, 98, 0.0),
-    createData('Marshmallow', 318, 0, 81, 2.0),
-    createData('Nougat', 360, 19.0, 9, 37.0),
-    createData('Oreo', 437, 18.0, 63, 4.0),
-];
+const rows = [];
+
+// name, id, type, count, description
 
 export default function EnhancedTable(props) {
-    console.log(props)
+    const dataStore = props.dataStore[props.indexTable]
+    console.log('dataStore', dataStore)
+    const [data, setData] = React.useState(dataStore)
+    
+    React.useEffect(() => {
+        
+        if (rows !== []) {
+            rows.splice(0, rows.length)
+            setData([])
+        }
+        
+        data.map((item, index) => {
+            switch (item.type) {
+                case "categories":
+                    rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
+                    break
+                case "manga":
+                    rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
+                    break
+                case "anime":
+                    rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
+                    break
+                default:
+                    console.log('Error')
+                    break
+            }
+            return index
+        })
+    },
+    []);
+    
+    
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [rowsChange, setRowsChange] = React.useState(false);
     const [textFieldValues, setTextFieldValues] = React.useState(
         {
             Dessert: '',
@@ -123,21 +138,11 @@ export default function EnhancedTable(props) {
         setPage(0);
     };
     
-    const handleChangeDense = (event) => {
-        setDense(event.target.checked);
-    };
-    
     const isSelected = (name) => selected.indexOf(name) !== -1;
     
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-    
-    const handleChangeRows = () => {
-        setRowsChange((prev) => !prev)
-        setSelected(() => selected.splice(0, selected.length))
-        console.log(rowsChange)
-    }
     
     const handleChangeTextField = event => {
         setTextFieldValues((prev) => ({
@@ -166,10 +171,10 @@ export default function EnhancedTable(props) {
     const editElementFunction = () => {
         rows[indexItem] = createData(
             textFieldValues.Dessert,
-            +textFieldValues.Calories,
-            +textFieldValues.Fat,
-            +textFieldValues.Carbs,
-            +textFieldValues.Protein
+            textFieldValues.Calories,
+            textFieldValues.Fat,
+            textFieldValues.Carbs,
+            textFieldValues.Protein
         )
         
         setAlert({
@@ -194,10 +199,10 @@ export default function EnhancedTable(props) {
         if (!isElementLocatedInRows) {
             rows.push(createData(
                 textFieldValues.Dessert,
-                +textFieldValues.Calories,
-                +textFieldValues.Fat,
-                +textFieldValues.Carbs,
-                +textFieldValues.Protein
+                textFieldValues.Calories,
+                textFieldValues.Fat,
+                textFieldValues.Carbs,
+                textFieldValues.Protein
             ))
             setAlert({
                 level: success,
@@ -232,7 +237,7 @@ export default function EnhancedTable(props) {
             Carbs: carbs,
             Protein: protein
         })
-        handleChangeRows()
+        setSelected([])
         setIndexItem(index)
         setIsEditing(true)
     }
@@ -241,7 +246,7 @@ export default function EnhancedTable(props) {
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
-                    onRowsChange={handleChangeRows}
+                    onClearSelected={() => setSelected([])}
                     numSelected={selected.length}
                     selectedItems={selected}
                     onClickEdit={(item, index) => handleClickEdit(item, index)}
@@ -265,7 +270,6 @@ export default function EnhancedTable(props) {
                     <Table
                         sx={{ minWidth: 750 }}
                         aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
                     >
                         <EnhancedTableHead
                             numSelected={selected.length}
@@ -321,7 +325,7 @@ export default function EnhancedTable(props) {
                             {emptyRows > 0 && (
                                 <TableRow
                                     style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
+                                        height: 53 * emptyRows,
                                     }}
                                 >
                                     <TableCell colSpan={6} />
@@ -340,11 +344,6 @@ export default function EnhancedTable(props) {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <FormControlLabel
-                sx={{marginBottom: '100px'}}
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label="Dense padding"
-            />
             <Alerts
                 level={alert.level}
                 message={alert.message}

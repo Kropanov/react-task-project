@@ -24,7 +24,6 @@ const FormForAddEdit = ({textFieldValues, onChangeTextField, onClickButton}) => 
             onChange={onChangeTextField}
             name="Calories"
             variant="filled"
-            type="number"
             required
         />
         <TextField
@@ -35,7 +34,6 @@ const FormForAddEdit = ({textFieldValues, onChangeTextField, onClickButton}) => 
             onChange={onChangeTextField}
             name="Fat"
             variant="filled"
-            type="number"
             required
         />
         <TextField
@@ -46,7 +44,6 @@ const FormForAddEdit = ({textFieldValues, onChangeTextField, onClickButton}) => 
             onChange={onChangeTextField}
             name="Carbs"
             variant="filled"
-            type="number"
             required
         />
         <TextField
@@ -57,7 +54,6 @@ const FormForAddEdit = ({textFieldValues, onChangeTextField, onClickButton}) => 
             onChange={onChangeTextField}
             name="Protein"
             variant="filled"
-            type="number"
             required
         />
         <Button sx={{ width: '100%'}} onClick={onClickButton} variant="contained" disableElevation endIcon={<SendIcon />}>
