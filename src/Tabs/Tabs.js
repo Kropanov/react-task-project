@@ -38,13 +38,16 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs() {
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
     const [data, setData] = useState([])
+    
+    const [categories, setCategories] = useState([]);
+    const [anime, setAnime] = useState([]);
+    const [manga, setManga] = useState([]);
 
     useEffect( () => {
         const getData = async (req) => {
             return await fetch(req).then((response) => {
-                console.log('Rendering data')
                 response.json().then((data) => {
                     setData((prev) => ([
                         ...prev,
@@ -63,8 +66,9 @@ export default function BasicTabs() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
-    // console.log(data)
+    console.log("anime", anime)
+    console.log("manga", manga)
+    console.log("categories", categories)
     
     return (
         <Box sx={{ width: '100%' }}>
@@ -77,25 +81,40 @@ export default function BasicTabs() {
             </Box>
             { data.length === 3
                 ?
-                <> 
+                <>
                     <TabPanel value={value} index={0}>
-                        {data != null ? <EnhancedTable indexTable={0} dataStore={data} /> : "Загрузка..."}
+                        {data !== null ?
+                            <EnhancedTable
+                                indexTable={0}
+                                dataStore={data[0]}
+                                data={categories}
+                                setData={(item) => setCategories(item)}
+                            />
+                            : "Загрузка..."}
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        {data != null ? <EnhancedTable indexTable={1} dataStore={data} /> : "Загрузка..."}
+                        {data !== null ?
+                            <EnhancedTable
+                                indexTable={1}
+                                dataStore={data[1]}
+                                data={anime}
+                                setData={(item) => setAnime(item)}
+                            />
+                            : "Загрузка..."}
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        {data != null ? <EnhancedTable indexTable={2} dataStore={data} /> : "Загрузка..."}
+                        {data !== null ?
+                            <EnhancedTable
+                                indexTable={2}
+                                dataStore={data[2]}
+                                data={manga}
+                                setData={(item) => setManga(item)}
+                            />
+                            : "Загрузка..."}
                     </TabPanel>
                 </>
-            : null
+                : null
             }
-            
-            {/* { data.map((item , index) => (
-                <TabPanel value={value} index={index} key={index}>
-                    {data != null ? <EnhancedTable indexTable={index} dataStore={data} /> : "Загрузка..."}
-                </TabPanel>
-            )) } */}
         </Box>
     );
 }

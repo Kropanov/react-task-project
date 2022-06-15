@@ -26,94 +26,43 @@ function createData(name, calories, fat, carbs, protein) {
 }
 
 let rows = [];
-
-let categories = [];
-let anime = [];
-let manga = [];
-
 // name, id, type, count, description
 
 export default function EnhancedTable(props) {
-
-    console.log(props.indexTable)
-    // const 
-    console.log("categories", categories);
-    console.log("anime", anime);
-    console.log("manga", manga)
-    console.log("rows", rows);
-
-    const [data, setData] = React.useState(props.dataStore)
-    const [check, setCheck] = React.useState(false)
-
+    
+    const [render, setRender] = React.useState(false);
+    
     React.useEffect(() => {
         
-        // if (rows !== []) {
-        //     // rows.splice(0, rows.length)
-        //     // setData([])
-        // }
-
-
-        if (categories.length === 0 && manga.length === 0 && anime.length === 0) {
-            data.map((arr) => {
-                return arr.map((item, index) => {
-                    switch (item.type) {
-                        case "categories":
-                            categories.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
-                            break
-                        case "manga":
-                            manga.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
-                            break
-                        case "anime":
-                            anime.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
-                            break
-                        default:
-                            console.log('Error')
-                            break
-                    }
-                    return index
-                })
+        rows = [...props.data]
+        
+        if (rows.length === 0) {
+            props.dataStore.map((item, index) => {
+                switch (item.type) {
+                    case "categories":
+                        rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
+                        break
+                    case "manga":
+                        rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
+                        break
+                    case "anime":
+                        rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
+                        break
+                    default:
+                        console.log('Error')
+                }
+                return index
             } )
         }
-
-        console.log("Length: ", rows)
-
-        switch (props.indexTable) {
-            case 0:
-                // if (rows.length === 0) {
-                //     rows = [...anime]
-                // } else {
-                //     console.log('aaaaaaaa')
-                //     anime = [...rows]
-                // }
-                rows = [...anime]
-                break
-            case 1:
-                rows = [...manga]
-                break
-            case 2:
-                rows = [...categories]
-                break
-        }
-
-        setCheck()
-
+        // the first time the data is not render, so I use hook
+        setRender(!render)
+        
         return () => {
-            console.log('Сброс')
-            switch (props.indexTable) {
-                case 0:
-                    anime = [...rows]
-                    break
-                case 1:
-                    manga = [...rows]
-                    break
-                case 2:
-                    categories = [...rows]
-                    break
-            }
+            props.setData([...rows])
+            rows.splice(0, rows.length)
         }
     },
-    [data]);
-    
+    []) // eslint-disable-line react-hooks/exhaustive-deps
     
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
