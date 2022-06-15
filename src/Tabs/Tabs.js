@@ -75,11 +75,27 @@ export default function BasicTabs() {
                     <Tab label="Table Three" {...a11yProps(2)} />
                 </Tabs>
             </Box>
-            { data.map((item , index) => (
+            { data.length === 3
+                ?
+                <> 
+                    <TabPanel value={value} index={0}>
+                        {data != null ? <EnhancedTable indexTable={0} dataStore={data} /> : "Загрузка..."}
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        {data != null ? <EnhancedTable indexTable={1} dataStore={data} /> : "Загрузка..."}
+                    </TabPanel>
+                    <TabPanel value={value} index={2}>
+                        {data != null ? <EnhancedTable indexTable={2} dataStore={data} /> : "Загрузка..."}
+                    </TabPanel>
+                </>
+            : null
+            }
+            
+            {/* { data.map((item , index) => (
                 <TabPanel value={value} index={index} key={index}>
                     {data != null ? <EnhancedTable indexTable={index} dataStore={data} /> : "Загрузка..."}
                 </TabPanel>
-            )) }
+            )) } */}
         </Box>
     );
 }

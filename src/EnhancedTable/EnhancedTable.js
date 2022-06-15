@@ -25,41 +25,94 @@ function createData(name, calories, fat, carbs, protein) {
     };
 }
 
-const rows = [];
+let rows = [];
+
+let categories = [];
+let anime = [];
+let manga = [];
 
 // name, id, type, count, description
 
 export default function EnhancedTable(props) {
-    const dataStore = props.dataStore[props.indexTable]
-    console.log('dataStore', dataStore)
-    const [data, setData] = React.useState(dataStore)
-    
+
+    console.log(props.indexTable)
+    // const 
+    console.log("categories", categories);
+    console.log("anime", anime);
+    console.log("manga", manga)
+    console.log("rows", rows);
+
+    const [data, setData] = React.useState(props.dataStore)
+    const [check, setCheck] = React.useState(false)
+
     React.useEffect(() => {
         
-        if (rows !== []) {
-            rows.splice(0, rows.length)
-            setData([])
+        // if (rows !== []) {
+        //     // rows.splice(0, rows.length)
+        //     // setData([])
+        // }
+
+
+        if (categories.length === 0 && manga.length === 0 && anime.length === 0) {
+            data.map((arr) => {
+                return arr.map((item, index) => {
+                    switch (item.type) {
+                        case "categories":
+                            categories.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
+                            break
+                        case "manga":
+                            manga.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
+                            break
+                        case "anime":
+                            anime.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
+                            break
+                        default:
+                            console.log('Error')
+                            break
+                    }
+                    return index
+                })
+            } )
         }
-        
-        data.map((item, index) => {
-            switch (item.type) {
-                case "categories":
-                    rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
+
+        console.log("Length: ", rows)
+
+        switch (props.indexTable) {
+            case 0:
+                // if (rows.length === 0) {
+                //     rows = [...anime]
+                // } else {
+                //     console.log('aaaaaaaa')
+                //     anime = [...rows]
+                // }
+                rows = [...anime]
+                break
+            case 1:
+                rows = [...manga]
+                break
+            case 2:
+                rows = [...categories]
+                break
+        }
+
+        setCheck()
+
+        return () => {
+            console.log('Сброс')
+            switch (props.indexTable) {
+                case 0:
+                    anime = [...rows]
                     break
-                case "manga":
-                    rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
+                case 1:
+                    manga = [...rows]
                     break
-                case "anime":
-                    rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
-                    break
-                default:
-                    console.log('Error')
+                case 2:
+                    categories = [...rows]
                     break
             }
-            return index
-        })
+        }
     },
-    []);
+    [data]);
     
     
     const [order, setOrder] = React.useState('asc');
@@ -244,7 +297,7 @@ export default function EnhancedTable(props) {
     
     return (
         <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
+            <Paper sx={{ width: '100%', mb: 7 }}>
                 <EnhancedTableToolbar
                     onClearSelected={() => setSelected([])}
                     numSelected={selected.length}
