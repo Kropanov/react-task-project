@@ -41,9 +41,9 @@ export default function BasicTabs() {
     const [value, setValue] = useState(0);
     const [data, setData] = useState([])
     
-    const [categories, setCategories] = useState([]);
-    const [anime, setAnime] = useState([]);
-    const [manga, setManga] = useState([]);
+    const [categories, setCategories] = useState([null]);
+    const [anime, setAnime] = useState([null]);
+    const [manga, setManga] = useState([null]);
 
     useEffect( () => {
         const getData = async (req) => {

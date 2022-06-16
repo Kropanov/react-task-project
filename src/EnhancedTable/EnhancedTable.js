@@ -34,9 +34,7 @@ export default function EnhancedTable(props) {
     
     React.useEffect(() => {
         
-        rows = [...props.data]
-        
-        if (rows.length === 0) {
+        if (props.data[0] === null) {
             props.dataStore.map((item, index) => {
                 switch (item.type) {
                     case "categories":
@@ -53,7 +51,10 @@ export default function EnhancedTable(props) {
                 }
                 return index
             } )
+        } else {
+            rows = [...props.data]
         }
+
         // the first time the data is not render, so I use hook
         setRender(!render)
         
