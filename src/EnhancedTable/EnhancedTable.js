@@ -3,17 +3,13 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import Checkbox from "@mui/material/Checkbox";
 import TablePagination from "@mui/material/TablePagination";
 import EnhancedTableToolbar from "./EnhancedTableToolbar/EnhancedTableToolbar"
 import EnhancedTableHead from "./EnhancedTableHead/EnhancedTableHead"
 import Alerts from "./Alerts/Alerts";
 import FormForAddEdit from "./FormForAddEdit/FormForAddEdit";
-import {getComparator, stableSort} from "./Sorting/Sorting";
 import {error, info, success, warning} from "./SeverityLevels/SeverityLevels";
+import EnhancedTableBody from "./EnhancedTableBody/EnhancedTableBody";
 
 function createData(name, calories, fat, carbs, protein) {
     return {
@@ -282,59 +278,16 @@ export default function EnhancedTable(props) {
                             onRequestSort={handleRequestSort}
                             rowCount={rows.length}
                         />
-                        <TableBody>
-                            {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-                 rows.slice().sort(getComparator(order, orderBy)) */}
-                            {stableSort(rows, getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    const isItemSelected = isSelected(row.name);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
-                                    
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={(event) => handleClick(event, row.name)}
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.name}
-                                            selected={isItemSelected}
-                                        >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell align="right">{row.calories}</TableCell>
-                                            <TableCell align="right">{row.fat}</TableCell>
-                                            <TableCell align="right">{row.carbs}</TableCell>
-                                            <TableCell align="right">{row.protein}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: 53 * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
+                        <EnhancedTableBody
+                            rows={rows}
+                            order={order}
+                            orderBy={orderBy}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            onIsSelected={(name) => isSelected(name)}
+                            onHandleClick={(event, name) => handleClick(event, name)}
+                            emptyRows={emptyRows}
+                        />
                     </Table>
                 </TableContainer>
                 <TablePagination
