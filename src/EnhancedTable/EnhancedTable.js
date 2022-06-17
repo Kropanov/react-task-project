@@ -11,56 +11,17 @@ import FormForAddEdit from "./FormForAddEdit/FormForAddEdit";
 import {error, info, success, warning} from "./SeverityLevels/SeverityLevels";
 import EnhancedTableBody from "./EnhancedTableBody/EnhancedTableBody";
 
-function createData(name, calories, fat, carbs, protein) {
+function createData(name, id, type, count, description) {
     return {
         name,
-        calories,
-        fat,
-        carbs,
-        protein,
+        id,
+        type,
+        count,
+        description,
     };
 }
 
-// let rows = [];
-// name, id, type, count, description
-
 export default function EnhancedTable(props) {
-    
-    // const [render, setRender] = React.useState(false);
-    
-    // React.useEffect(() => {
-    //
-    //     if (props.data[0] === null) {
-    //         props.dataStore.map((item, index) => {
-    //             switch (item.type) {
-    //                 case "categories":
-    //                     rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
-    //                     break
-    //                 case "manga":
-    //                     rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
-    //                     break
-    //                 case "anime":
-    //                     rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
-    //                     break
-    //                 default:
-    //                     console.log('Error')
-    //             }
-    //             return index
-    //         } )
-    //     } else {
-    //         rows = [...props.data]
-    //     }
-    //
-    //     // the first time the data is not render, so I use hook
-    //     setRender(!render)
-    //
-    //     return () => {
-    //         console.log(">>>>> UNMOUNT");
-    //         props.setData([...rows])
-    //         rows.splice(0, rows.length)
-    //     }
-    // },
-    // []) // eslint-disable-line react-hooks/exhaustive-deps
     
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -69,19 +30,19 @@ export default function EnhancedTable(props) {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [textFieldValues, setTextFieldValues] = React.useState(
         {
-            Dessert: '',
-            Calories: '',
-            Fat: '',
-            Carbs: '',
-            Protein: ''
+            name: '',
+            id: '',
+            type: '',
+            count: '',
+            description: ''
         }
     );
     const validation = (data) => {
-        return data.Dessert === '' ||
-            data.Calories === '' ||
-            data.Fat === '' ||
-            data.Carbs === '' ||
-            data.Protein === '';
+        return data.name === '' ||
+            data.id === '' ||
+            data.type === '' ||
+            data.count === '' ||
+            data.description === '';
     }
 
     
@@ -146,16 +107,14 @@ export default function EnhancedTable(props) {
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.data.length) : 0;
-
-    
     
     const cleanTextFieldValues = (setTextFieldValues) => {
         setTextFieldValues({
-            Dessert: '',
-            Calories: '',
-            Fat: '',
-            Carbs: '',
-            Protein: ''
+            name: '',
+            id: '',
+            type: '',
+            count: '',
+            description: ''
         })
     }
     
@@ -171,23 +130,15 @@ export default function EnhancedTable(props) {
 
         props.setData((prev) => {
             prev[indexItem] = createData(
-                data.Dessert,
-                data.Calories,
-                data.Fat,
-                data.Carbs,
-                data.Protein
+                data.name,
+                data.id,
+                data.type,
+                data.count,
+                data.description
             )
 
             return prev;
         });
-        // rows[indexItem] = createData(
-        //     textFieldValues.Dessert,
-        //     textFieldValues.Calories,
-        //     textFieldValues.Fat,
-        //     textFieldValues.Carbs,
-        //     textFieldValues.Protein
-        // )
-
         
         setAlert({
             level: info,
@@ -203,27 +154,20 @@ export default function EnhancedTable(props) {
         isElementLocatedInRows = false
     
         props.data.map((row, index) => {
-            if (row.name === data.Dessert) {
+            if (row.name === data.name) {
                 isElementLocatedInRows = true
             }
             return index
         })
     
         if (!isElementLocatedInRows) {
-            // rows.push(createData(
-            //     textFieldValues.Dessert,
-            //     textFieldValues.Calories,
-            //     textFieldValues.Fat,
-            //     textFieldValues.Carbs,
-            //     textFieldValues.Protein
-            // ))
             props.setData((prev) => {
                 prev.push(createData(
-                    data.Dessert,
-                    data.Calories,
-                    data.Fat,
-                    data.Carbs,
-                    data.Protein
+                    data.name,
+                    data.id,
+                    data.type,
+                    data.count,
+                    data.description
                 ))
 
                 return prev;
@@ -253,14 +197,14 @@ export default function EnhancedTable(props) {
     }
     
     const handleClickEdit = (item, index) => {
-        const {name, calories, fat, carbs, protein} = item
+        const {name, id, type, count, description} = item
         console.log(">>>>> ITEM", JSON.stringify(item));
         setTextFieldValues({
-            Dessert: name,
-            Calories: calories,
-            Fat: fat,
-            Carbs: carbs,
-            Protein: protein
+            name,
+            id,
+            type,
+            count,
+            description
         })
         setSelected([])
         setIndexItem(index)

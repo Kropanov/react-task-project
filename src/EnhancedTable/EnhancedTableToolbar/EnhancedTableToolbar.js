@@ -77,7 +77,7 @@ const EnhancedTableToolbar = (props) => {
                     id="tableTitle"
                     component="div"
                 >
-                    Desserts
+                    {data.length !== 0 ? data[0].type : "table"}
                 </Typography>
             )}
             

@@ -8,36 +8,36 @@ import {visuallyHidden} from "@mui/utils";
 import PropTypes from "prop-types";
 import * as React from "react";
 
-const headCells = [
+const headCells = [ // name, id, type, count, description
     {
         id: 'name',
         numeric: false,
         disablePadding: true,
-        label: 'Dessert (100g serving)',
+        label: 'name',
     },
     {
         id: 'calories',
         numeric: true,
         disablePadding: false,
-        label: 'Calories',
+        label: 'id',
     },
     {
         id: 'fat',
         numeric: true,
         disablePadding: false,
-        label: 'Fat (g)',
+        label: 'type',
     },
     {
         id: 'carbs',
         numeric: true,
         disablePadding: false,
-        label: 'Carbs (g)',
+        label: 'count',
     },
     {
         id: 'protein',
         numeric: true,
         disablePadding: false,
-        label: 'Protein (g)',
+        label: 'description',
     },
 ];
 

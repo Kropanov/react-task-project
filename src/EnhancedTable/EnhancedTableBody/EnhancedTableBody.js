@@ -55,10 +55,10 @@ const EnhancedTableBody = (props) => {
                             >
                                 {row.name}
                             </TableCell>
-                            <TableCell align="right">{row.calories}</TableCell>
-                            <TableCell align="right">{row.fat}</TableCell>
-                            <TableCell align="right">{row.carbs}</TableCell>
-                            <TableCell align="right">{row.protein}</TableCell>
+                            <TableCell align="right">{row.id}</TableCell>
+                            <TableCell align="right">{row.type}</TableCell>
+                            <TableCell align="right">{row.count}</TableCell>
+                            <TableCell align="right">{row.description}</TableCell>
                         </TableRow>
                     );
                 })}

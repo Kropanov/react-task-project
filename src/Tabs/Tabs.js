@@ -24,13 +24,13 @@ function TabPanel(props) {
     );
 }
 
-function createData(name, calories, fat, carbs, protein) {
+function createData(name, id, type, count, description) {
     return {
         name,
-        calories,
-        fat,
-        carbs,
-        protein,
+        id,
+        type,
+        count,
+        description,
     };
 }
 
@@ -63,7 +63,7 @@ export default function BasicTabs() {
                             setAnime(() => {
                                 let items = [];
                                 data.data.forEach((item) => {
-                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis.substring(0, 25)));
+                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis));
                                 });
                                 return items;
                             });
@@ -72,7 +72,7 @@ export default function BasicTabs() {
                             setManga(() => {
                                 let items = [];
                                 data.data.forEach((item) => {
-                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis.substring(0, 25)));
+                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis));
                                 });
                                 return items;
                             });
@@ -81,7 +81,7 @@ export default function BasicTabs() {
                             setCategories(() => {
                                 let items = [];
                                 data.data.forEach((item) => {
-                                    items.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description.substring(0, 25)));
+                                    items.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description));
                                 });
                                 return items;
                             });
@@ -104,17 +104,13 @@ export default function BasicTabs() {
         setValue(newValue);
     };
 
-    // console.log("anime", anime)
-    // console.log("manga", manga)
-    // console.log("categories", categories)
-
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
-                    <Tab label="Table One" {...a11yProps(0)} />
-                    <Tab label="Table Two" {...a11yProps(1)} />
-                    <Tab label="Table Three" {...a11yProps(2)} />
+                    <Tab label="Table Сategories" {...a11yProps(0)} />
+                    <Tab label="Table Anime" {...a11yProps(1)} />
+                    <Tab label="Table Manga" {...a11yProps(2)} />
                 </Tabs>
             </Box>
             <TabPanel value={value} index={0}>

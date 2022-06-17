@@ -38,7 +38,7 @@ const FormForAddEdit = (props) => {
             right: 0,
             borderTop: '1px solid rgba(0,0,0, 0.25)'
         }} elevation={3}>
-            {["Dessert", "Calories", "Fat", "Carbs", "Protein"].map((item, index) => (
+            {["name", "id", "type", "count", "description"].map((item, index) => (
                 <TextField
                     key={index}
                     sx={{width: '100%'}}
