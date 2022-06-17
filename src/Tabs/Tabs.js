@@ -24,6 +24,16 @@ function TabPanel(props) {
     );
 }
 
+function createData(name, calories, fat, carbs, protein) {
+    return {
+        name,
+        calories,
+        fat,
+        carbs,
+        protein,
+    };
+}
+
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.number.isRequired,
@@ -39,37 +49,65 @@ function a11yProps(index) {
 
 export default function BasicTabs() {
     const [value, setValue] = useState(0);
-    const [data, setData] = useState([])
-    
-    const [categories, setCategories] = useState([null]);
-    const [anime, setAnime] = useState([null]);
-    const [manga, setManga] = useState([null]);
+
+    const [categories, setCategories] = useState([]);
+    const [anime, setAnime] = useState([]);
+    const [manga, setManga] = useState([]);
 
     useEffect( () => {
-        const getData = async (req) => {
+        const getData = async (req, type) => {
             return await fetch(req).then((response) => {
                 response.json().then((data) => {
-                    setData((prev) => ([
-                        ...prev,
-                        data.data
-                    ]))
+                    switch(type) {
+                        case 'anime':
+                            setAnime(() => {
+                                let items = [];
+                                data.data.forEach((item) => {
+                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis.substring(0, 25)));
+                                });
+                                return items;
+                            });
+                            break;
+                        case 'manga':
+                            setManga(() => {
+                                let items = [];
+                                data.data.forEach((item) => {
+                                    items.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis.substring(0, 25)));
+                                });
+                                return items;
+                            });
+                            break;
+                        case 'categories':
+                            setCategories(() => {
+                                let items = [];
+                                data.data.forEach((item) => {
+                                    items.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description.substring(0, 25)));
+                                });
+                                return items;
+                            });
+                            break;
+                        default:
+                            console.log('Unknown Type')
+                    }
                 }).catch((err) => {
                     console.log(err);
                 })
             });
         }
-        getData('https://kitsu.io/api/edge/anime');
-        getData('https://kitsu.io/api/edge/manga');
-        getData('https://kitsu.io/api/edge/categories');
-      }, []);
-    
+
+        getData('https://kitsu.io/api/edge/anime', 'anime');
+        getData('https://kitsu.io/api/edge/manga', 'manga');
+        getData('https://kitsu.io/api/edge/categories', 'categories');
+    }, []);
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
     console.log("anime", anime)
     console.log("manga", manga)
     console.log("categories", categories)
-    
+
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -79,42 +117,24 @@ export default function BasicTabs() {
                     <Tab label="Table Three" {...a11yProps(2)} />
                 </Tabs>
             </Box>
-            { data.length === 3
-                ?
-                <>
-                    <TabPanel value={value} index={0}>
-                        {data !== null ?
-                            <EnhancedTable
-                                indexTable={0}
-                                dataStore={data[0]}
-                                data={categories}
-                                setData={(item) => setCategories(item)}
-                            />
-                            : "Загрузка..."}
-                    </TabPanel>
-                    <TabPanel value={value} index={1}>
-                        {data !== null ?
-                            <EnhancedTable
-                                indexTable={1}
-                                dataStore={data[1]}
-                                data={anime}
-                                setData={(item) => setAnime(item)}
-                            />
-                            : "Загрузка..."}
-                    </TabPanel>
-                    <TabPanel value={value} index={2}>
-                        {data !== null ?
-                            <EnhancedTable
-                                indexTable={2}
-                                dataStore={data[2]}
-                                data={manga}
-                                setData={(item) => setManga(item)}
-                            />
-                            : "Загрузка..."}
-                    </TabPanel>
-                </>
-                : null
-            }
+            <TabPanel value={value} index={0}>
+                <EnhancedTable
+                    data={categories}
+                    setData={setCategories}
+                />
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                <EnhancedTable
+                    data={anime}
+                    setData={setAnime}
+                />
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                <EnhancedTable
+                    data={manga}
+                    setData={setManga}
+                />
+            </TabPanel>
         </Box>
     );
 }

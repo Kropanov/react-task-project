@@ -8,7 +8,7 @@ import React from 'react';
 const EnhancedTableBody = (props) => {
     
     const {
-        rows,
+        data,
         order,
         orderBy,
         page,
@@ -22,7 +22,7 @@ const EnhancedTableBody = (props) => {
         <TableBody>
             {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
-            {stableSort(rows, getComparator(order, orderBy))
+            {stableSort(data, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                     const isItemSelected = onIsSelected(row.name);

@@ -21,51 +21,52 @@ function createData(name, calories, fat, carbs, protein) {
     };
 }
 
-let rows = [];
+// let rows = [];
 // name, id, type, count, description
 
 export default function EnhancedTable(props) {
     
-    const [render, setRender] = React.useState(false);
+    // const [render, setRender] = React.useState(false);
     
-    React.useEffect(() => {
-        
-        if (props.data[0] === null) {
-            props.dataStore.map((item, index) => {
-                switch (item.type) {
-                    case "categories":
-                        rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
-                        break
-                    case "manga":
-                        rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
-                        break
-                    case "anime":
-                        rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
-                        break
-                    default:
-                        console.log('Error')
-                }
-                return index
-            } )
-        } else {
-            rows = [...props.data]
-        }
-
-        // the first time the data is not render, so I use hook
-        setRender(!render)
-        
-        return () => {
-            props.setData([...rows])
-            rows.splice(0, rows.length)
-        }
-    },
-    []) // eslint-disable-line react-hooks/exhaustive-deps
+    // React.useEffect(() => {
+    //
+    //     if (props.data[0] === null) {
+    //         props.dataStore.map((item, index) => {
+    //             switch (item.type) {
+    //                 case "categories":
+    //                     rows.push(createData(item.attributes.title, item.id, item.type, item.attributes.totalMediaCount, item.attributes.description))
+    //                     break
+    //                 case "manga":
+    //                     rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.chapterCount, item.attributes.synopsis))
+    //                     break
+    //                 case "anime":
+    //                     rows.push(createData(item.attributes.canonicalTitle, item.id, item.type, item.attributes.episodeCount, item.attributes.synopsis))
+    //                     break
+    //                 default:
+    //                     console.log('Error')
+    //             }
+    //             return index
+    //         } )
+    //     } else {
+    //         rows = [...props.data]
+    //     }
+    //
+    //     // the first time the data is not render, so I use hook
+    //     setRender(!render)
+    //
+    //     return () => {
+    //         console.log(">>>>> UNMOUNT");
+    //         props.setData([...rows])
+    //         rows.splice(0, rows.length)
+    //     }
+    // },
+    // []) // eslint-disable-line react-hooks/exhaustive-deps
     
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [textFieldValues, setTextFieldValues] = React.useState(
         {
             Dessert: '',
@@ -75,11 +76,13 @@ export default function EnhancedTable(props) {
             Protein: ''
         }
     );
-    const validation =  textFieldValues.Dessert === '' ||
-                        textFieldValues.Calories === '' ||
-                        textFieldValues.Fat === '' ||
-                        textFieldValues.Carbs === '' ||
-                        textFieldValues.Protein === ''
+    const validation = (data) => {
+        return data.Dessert === '' ||
+            data.Calories === '' ||
+            data.Fat === '' ||
+            data.Carbs === '' ||
+            data.Protein === '';
+    }
     
     const [open, setOpen] = React.useState(false);
     const [alert, setAlert] = React.useState({
@@ -101,7 +104,7 @@ export default function EnhancedTable(props) {
     
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
+            const newSelecteds = props.data.map((n) => n.name);
             setSelected(newSelecteds);
             return;
         }
@@ -141,14 +144,7 @@ export default function EnhancedTable(props) {
     
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-    
-    const handleChangeTextField = event => {
-        setTextFieldValues((prev) => ({
-            ...prev,
-            [event.target.name]: event.target.value
-        }))
-    }
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.data.length) : 0;
     
     const cleanTextFieldValues = () => {
         setTextFieldValues({
@@ -167,14 +163,27 @@ export default function EnhancedTable(props) {
         })
     }
     
-    const editElementFunction = () => {
-        rows[indexItem] = createData(
-            textFieldValues.Dessert,
-            textFieldValues.Calories,
-            textFieldValues.Fat,
-            textFieldValues.Carbs,
-            textFieldValues.Protein
-        )
+    const editElementFunction = (data) => {
+        console.log(">>>>> editElementFunction", data);
+
+        props.setData((prev) => {
+            prev[indexItem] = createData(
+                data.Dessert,
+                data.Calories,
+                data.Fat,
+                data.Carbs,
+                data.Protein
+            )
+
+            return prev;
+        });
+        // rows[indexItem] = createData(
+        //     textFieldValues.Dessert,
+        //     textFieldValues.Calories,
+        //     textFieldValues.Fat,
+        //     textFieldValues.Carbs,
+        //     textFieldValues.Protein
+        // )
         
         setAlert({
             level: info,
@@ -185,24 +194,35 @@ export default function EnhancedTable(props) {
         cleanTextFieldValues()
     }
     
-    const addElementFunction = () => {
+    const addElementFunction = (data) => {
         isElementLocatedInRows = false
     
-        rows.map((row, index) => {
-            if (row.name === textFieldValues.Dessert) {
+        props.data.map((row, index) => {
+            if (row.name === data.Dessert) {
                 isElementLocatedInRows = true
             }
             return index
         })
     
         if (!isElementLocatedInRows) {
-            rows.push(createData(
-                textFieldValues.Dessert,
-                textFieldValues.Calories,
-                textFieldValues.Fat,
-                textFieldValues.Carbs,
-                textFieldValues.Protein
-            ))
+            // rows.push(createData(
+            //     textFieldValues.Dessert,
+            //     textFieldValues.Calories,
+            //     textFieldValues.Fat,
+            //     textFieldValues.Carbs,
+            //     textFieldValues.Protein
+            // ))
+            props.setData((prev) => {
+                prev.push(createData(
+                    data.Dessert,
+                    data.Calories,
+                    data.Fat,
+                    data.Carbs,
+                    data.Protein
+                ))
+
+                return prev;
+            });
             setAlert({
                 level: success,
                 message: 'Element has been added to the table!'
@@ -216,19 +236,20 @@ export default function EnhancedTable(props) {
         cleanTextFieldValues()
     }
     
-    const handleClickButton = () => {
-        if (validation) {
+    const handleClickButton = (data) => {
+        if (validation(data)) {
             validateTextFields()
         } else if (isEditing) {
-            editElementFunction()
+            editElementFunction(data)
         } else {
-            addElementFunction()
+            addElementFunction(data)
         }
         setOpen(true)
     }
     
     const handleClickEdit = (item, index) => {
         const {name, calories, fat, carbs, protein} = item
+        console.log(">>>>> ITEM", JSON.stringify(item));
         setTextFieldValues({
             Dessert: name,
             Calories: calories,
@@ -241,6 +262,8 @@ export default function EnhancedTable(props) {
         setIsEditing(true)
     }
     
+    console.log("RENDER")
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 7 }}>
@@ -249,7 +272,8 @@ export default function EnhancedTable(props) {
                     numSelected={selected.length}
                     selectedItems={selected}
                     onClickEdit={(item, index) => handleClickEdit(item, index)}
-                    rows={rows}
+                    data={props.data}
+                    setData={props.setData}
                     onEditAlert={() => {
                         setAlert({
                             level: warning,
@@ -276,10 +300,10 @@ export default function EnhancedTable(props) {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
+                            rowCount={props.data.length}
                         />
                         <EnhancedTableBody
-                            rows={rows}
+                            data={props.data}
                             order={order}
                             orderBy={orderBy}
                             page={page}
@@ -291,9 +315,9 @@ export default function EnhancedTable(props) {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[10, 25]}
                     component="div"
-                    count={rows.length}
+                    count={props.data.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -308,7 +332,6 @@ export default function EnhancedTable(props) {
             />
             <FormForAddEdit
                 textFieldValues={textFieldValues}
-                onChangeTextField={event => handleChangeTextField(event)}
                 onClickButton={handleClickButton}
             />
         </Box>
