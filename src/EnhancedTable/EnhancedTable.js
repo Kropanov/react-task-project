@@ -83,6 +83,7 @@ export default function EnhancedTable(props) {
             data.Carbs === '' ||
             data.Protein === '';
     }
+
     
     const [open, setOpen] = React.useState(false);
     const [alert, setAlert] = React.useState({
@@ -145,8 +146,10 @@ export default function EnhancedTable(props) {
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.data.length) : 0;
+
     
-    const cleanTextFieldValues = () => {
+    
+    const cleanTextFieldValues = (setTextFieldValues) => {
         setTextFieldValues({
             Dessert: '',
             Calories: '',
@@ -184,6 +187,7 @@ export default function EnhancedTable(props) {
         //     textFieldValues.Carbs,
         //     textFieldValues.Protein
         // )
+
         
         setAlert({
             level: info,
@@ -191,10 +195,11 @@ export default function EnhancedTable(props) {
         })
     
         setIsEditing(false)
-        cleanTextFieldValues()
+        cleanTextFieldValues(setTextFieldValues)
     }
     
     const addElementFunction = (data) => {
+
         isElementLocatedInRows = false
     
         props.data.map((row, index) => {
@@ -233,7 +238,7 @@ export default function EnhancedTable(props) {
                 message: 'This element is already available in the table!'
             })
         }
-        cleanTextFieldValues()
+        cleanTextFieldValues(setTextFieldValues)
     }
     
     const handleClickButton = (data) => {
