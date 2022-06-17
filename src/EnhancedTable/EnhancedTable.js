@@ -66,20 +66,8 @@ export default function EnhancedTable(props) {
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [textFieldValues, setTextFieldValues] = React.useState(
-        {
-            Dessert: '',
-            Calories: '',
-            Fat: '',
-            Carbs: '',
-            Protein: ''
-        }
-    );
-    const validation =  textFieldValues.Dessert === '' ||
-                        textFieldValues.Calories === '' ||
-                        textFieldValues.Fat === '' ||
-                        textFieldValues.Carbs === '' ||
-                        textFieldValues.Protein === ''
+    
+    
     
     const [open, setOpen] = React.useState(false);
     const [alert, setAlert] = React.useState({
@@ -143,14 +131,9 @@ export default function EnhancedTable(props) {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
     
-    const handleChangeTextField = event => {
-        setTextFieldValues((prev) => ({
-            ...prev,
-            [event.target.name]: event.target.value
-        }))
-    }
     
-    const cleanTextFieldValues = () => {
+    
+    const cleanTextFieldValues = (setTextFieldValues) => {
         setTextFieldValues({
             Dessert: '',
             Calories: '',
@@ -167,7 +150,7 @@ export default function EnhancedTable(props) {
         })
     }
     
-    const editElementFunction = () => {
+    const editElementFunction = (textFieldValues, setTextFieldValues) => {
         rows[indexItem] = createData(
             textFieldValues.Dessert,
             textFieldValues.Calories,
@@ -182,10 +165,10 @@ export default function EnhancedTable(props) {
         })
     
         setIsEditing(false)
-        cleanTextFieldValues()
+        cleanTextFieldValues(setTextFieldValues)
     }
     
-    const addElementFunction = () => {
+    const addElementFunction = (textFieldValues, setTextFieldValues) => {
         isElementLocatedInRows = false
     
         rows.map((row, index) => {
@@ -213,34 +196,43 @@ export default function EnhancedTable(props) {
                 message: 'This element is already available in the table!'
             })
         }
-        cleanTextFieldValues()
+        cleanTextFieldValues(setTextFieldValues)
     }
     
-    const handleClickButton = () => {
+    const handleClickButton = (textFieldValues, setTextFieldValues) => {
+
+        const validation =  textFieldValues.Dessert === '' ||
+                            textFieldValues.Calories === '' ||
+                            textFieldValues.Fat === '' ||
+                            textFieldValues.Carbs === '' ||
+                            textFieldValues.Protein === ''
+
         if (validation) {
             validateTextFields()
         } else if (isEditing) {
-            editElementFunction()
+            editElementFunction(textFieldValues, setTextFieldValues)
         } else {
-            addElementFunction()
+            addElementFunction(textFieldValues, setTextFieldValues)
         }
         setOpen(true)
     }
     
-    const handleClickEdit = (item, index) => {
-        const {name, calories, fat, carbs, protein} = item
-        setTextFieldValues({
-            Dessert: name,
-            Calories: calories,
-            Fat: fat,
-            Carbs: carbs,
-            Protein: protein
-        })
+    const handleClickEdit = (item, index) => { 
+        // const {name, calories, fat, carbs, protein} = item
+        // setTextFieldValues({
+        //     Dessert: name,
+        //     Calories: calories,
+        //     Fat: fat,
+        //     Carbs: carbs,
+        //     Protein: protein
+        // })
         setSelected([])
         setIndexItem(index)
         setIsEditing(true)
     }
     
+    console.log("RENDER")
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 7 }}>
@@ -307,9 +299,7 @@ export default function EnhancedTable(props) {
                 setOpen={() => setOpen(false)}
             />
             <FormForAddEdit
-                textFieldValues={textFieldValues}
-                onChangeTextField={event => handleChangeTextField(event)}
-                onClickButton={handleClickButton}
+                onClickButton={(textFieldValues, setTextFieldValues) => handleClickButton(textFieldValues, setTextFieldValues)}
             />
         </Box>
     );

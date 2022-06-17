@@ -66,9 +66,9 @@ export default function BasicTabs() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-    console.log("anime", anime)
-    console.log("manga", manga)
-    console.log("categories", categories)
+    // console.log("anime", anime)
+    // console.log("manga", manga)
+    // console.log("categories", categories)
     
     return (
         <Box sx={{ width: '100%' }}>
